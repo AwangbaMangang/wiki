@@ -1,2 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wikipedia to Meetei Mayek Translator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-u
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.97);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+        }
+
+        .logo {
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            color: #fdbb2d;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .search-container {
+            padding: 25px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 12px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 16px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+
+        button {
+            padding: 16px 28px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        button:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .view-options {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .view-option {
+            padding: 12px 20px;
+            background: #e8f4fc;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .view-option.active {
+            background: #3498db;
+            color: white;
+            border-color: #2c3e50;
+        }
+
+        .view-option:hover {
+            background: #d1e9f9;
+        }
+
+        .content-area {
+            display: flex;
+            min-height: 600px;
+        }
+
+        .original-content, .translated-content {
+            flex: 1;
+            padding: 25px;
+            overflow-y: auto;
+            max-height: 70vh;
+        }
+
+        .original-content {
+            border-right: 1px solid #e0e0e0;
+            background: #fcfcfc;
+        }
+
+        .translated-content {
+            background: #fff;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h2 i {
+            color: #3498db;
+        }
+
+        .article-content {
+            line-height: 1.8;
+        }
+
+        .article-content p {
+            margin-bottom: 20px;
+            font-size: 1.05rem;
+        }
+
+        .article-content h3 {
+            margin: 25px 0 15px;
+            color: #2c3e50;
+        }
+
+        .article-content ul, .article-content ol {
+            margin-bottom: 20px;
+            padding-left: 30px;
+        }
+
+        .article-content li {
+            margin-bottom: 8px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+            font-size: 1.2rem;
+        }
+
+        .loading i {
+            display: block;
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: #3498db;
+            animation: spin 1.5s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            color: #e74c3c;
+            padding: 15px;
+            background: #ffeaea;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #e74c3c;
+        }
+
+        .language-note {
+            font-size: 0.95rem;
+            color: #7f8c8d;
+            margin-top: 15px;
+            font-style: italic;
+            text-align: center;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #7f8c8d;
+            font-size: 0.95rem;
+            background: #f8f9fa;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .meetei-sample {
+            font-family: 'Noto Sans Meetei Mayek', sans-serif;
+            font-size: 1.2rem;
+            line-height: 1.8;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            .content-area {
+                flex-direction: column;
+            }
+            
+            .original-content {
+                border-right: none;
+                border-bottom: 1px solid #e0e0e0;
+            }
+            
+            .search-box {
+                flex-direction: column;
+            }
+            
+            input[type="text"] {
+                width: 100%;
+            }
+            
+            button {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+        }
+
+        /* Desktop Enhancements */
+        @media (min-width: 1024px) {
+            .content-area {
+                min-height: 700px;
+            }
+            
+            .original-content, .translated-content {
+                max-height: 65vh;
+            }
+            
+            .article-content {
+                padding: 0 15px;
+            }
+        }
+
+        /* Meetei Mayek font */
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Meetei+Mayek:wght@400;500;600&display=swap');
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fab fa-wikipedia-w"></i>
+            </div>
+            <h1>Wikipedia to Meetei Mayek</h1>
+            <p class="subtitle">Search Wikipedia articles and view translations in Meetei Mayek</p>
+        </header>
+        
+        <div class="search-container">
+            <div class="search-box">
+                <input type="text" id="search-input" placeholder="Enter a topic to search on Wikipedia...">
+                <button id="search-btn">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </div>
+            
+            <div class="view-options">
+                <div class="view-option active" data-view="split">Split View</div>
+                <div class="view-option" data-view="original">Original Only</div>
+                <div class="view-option" data-view="translated">Translated Only</div>
+            </div>
+            
+            <p class="language-note">Note: Translation is from English to Meetei Mayek (Manipuri)</p>
+        </div>
+        
+        <div class="content-area">
+            <div class="original-content">
+                <h2><i class="fas fa-file-alt"></i> Original Article (English)</h2>
+                <div id="original-article" class="article-content">
+                    <div class="loading">
+                        <i class="fas fa-spinner"></i>
+                        <p>Your search results will appear here...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="translated-content">
+                <h2><i class="fas fa-language"></i> Translated Article (Meetei Mayek)</h2>
+                <div id="translated-article" class="article-content">
+                    <div class="loading">
+                        <i class="fas fa-spinner"></i>
+                        <p>The translation will appear here...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Wikipedia Search & Machine Translation to Meetei Mayek</p>
+            <p>Note: This is a demonstration of the concept. Actual Meetei Mayek translation would require a specialized translation API.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('search-input');
+            const searchBtn = document.getElementById('search-btn');
+            const originalArticle = document.getElementById('original-article');
+            const translatedArticle = document.getElementById('translated-article');
+            const viewOptions = document.querySelectorAll('.view-option');
+            
+            // Focus on search input on load
+            searchInput.focus();
+            
+            // Add event listener for search button
+            searchBtn.addEventListener('click', performSearch);
+            
+            // Add event listener for Enter key in search input
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+            
+            // Add event listeners for view options
+            viewOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    viewOptions.forEach(opt => opt.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const view = this.getAttribute('data-view');
+                    changeView(view);
+                });
+            });
+            
+            // Function to change view
+            function changeView(view) {
+                const originalContent = document.querySelector('.original-content');
+                const translatedContent = document.querySelector('.translated-content');
+                
+                if (view === 'split') {
+                    originalContent.style.display = 'block';
+                    translatedContent.style.display = 'block';
+                    originalContent.style.flex = '1';
+                    translatedContent.style.flex = '1';
+                } else if (view === 'original') {
+                    originalContent.style.display = 'block';
+                    translatedContent.style.display = 'none';
+                    originalContent.style.flex = '1';
+                } else if (view === 'translated') {
+                    originalContent.style.display = 'none';
+                    translatedContent.style.display = 'block';
+                    translatedContent.style.flex = '1';
+                }
+            }
+            
+            // Function to perform the search
+            function performSearch() {
+                const searchTerm = searchInput.value.trim();
+                
+                if (searchTerm === '') {
+                    showError(originalArticle, 'Please enter a search term.');
+                    return;
+                }
+                
+                // Show loading state
+                originalArticle.innerHTML = '<div class="loading"><i class="fas fa-spinner"></i><p>Searching Wikipedia...</p></div>';
+                translatedArticle.innerHTML = '<div class="loading"><i class="fas fa-spinner"></i><p>Preparing for translation...</p></div>';
+                
+                // Fetch Wikipedia article
+                fetchWikipediaArticle(searchTerm);
+            }
+            
+            // Function to fetch Wikipedia article
+            function fetchWikipediaArticle(searchTerm) {
+                // Use Wikipedia API for full content
+                const apiUrl = `https://en.wikipedia.org/api/rest_v1/page/html/${encodeURIComponent(searchTerm)}`;
+                
+                fetch(apiUrl)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Article not found');
+                        }
+                        return response.text();
+                    })
+                    .then(html => {
+                        // Display the original article
+                        displayOriginalArticle(html);
+                        
+                        // Simulate translation to Meetei Mayek
+                        simulateTranslation(html);
+                    })
+                    .catch(error => {
+                        showError(originalArticle, `Error: ${error.message}. Please try another search term.`);
+                        translatedArticle.innerHTML = '<div class="loading">Translation failed due to search error.</div>';
+                    });
+            }
+            
+            // Function to display the original article
+            function displayOriginalArticle(html) {
+                // Clean up Wikipedia HTML for better display
+                const cleanedHtml = html
+                    .replace(/<style([\s\S]*?)>([\s\S]*?)<\/style>/gi, '')
+                    .replace(/<script([\s\S]*?)>([\s\S]*?)<\/script>/gi, '')
+                    .replace(/<div class="navbox">([\s\S]*?)<\/div>/gi, '')
+                    .replace(/<span class="mw-editsection">([\s\S]*?)<\/span>/gi, '');
+                
+                originalArticle.innerHTML = `
+                    <div class="article-content">${cleanedHtml}</div>
+                    <p class="language-note">Source: Wikipedia</p>
+                `;
+            }
+            
+            // Function to simulate translation (since we can't use a real Meetei Mayek translation API)
+            function simulateTranslation(html) {
+                translatedArticle.innerHTML = '<div class="loading"><i class="fas fa-spinner"></i><p>Translating to Meetei Mayek...</p></div>';
+                
+                // Simulate API delay
+                setTimeout(() => {
+                    // This is a simulation since we don't have a real Meetei Mayek translation API
+                    // In a real implementation, you would use a translation API here
+                    
+                    // Extract text content from HTML for translation simulation
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = html;
+                    const textContent = tempDiv.textContent || tempDiv.innerText;
+                    
+                    // Display simulated translation with Meetei Mayek font
+                    translatedArticle.innerHTML = `
+                        <div class="article-content">
+                            <div class="meetei-sample">
+                                <p>ꯃꯁꯤꯒꯤ ꯋꯤꯀꯤꯄꯦꯗꯤꯌꯥ ꯂꯃꯥꯏꯒꯤ ꯍꯟꯗꯣꯛꯄꯥ ꯑꯃꯅꯤ꯫</p>
+                                <p>ꯍꯟꯗꯣꯛꯄꯥ ꯑꯁꯤꯅꯥ ꯃꯤꯇꯩꯂꯣꯟ (ꯃꯩꯇꯩꯂꯣꯟ)ꯗꯥ ꯎꯠꯂꯤ꯫</p>
+                            </div>
+                            
+                            <h3>ꯏꯔꯤꯕꯤꯡꯒꯤ ꯃꯇꯥꯡꯗꯥ</h3>
+                            <p>ꯏꯔꯤꯕꯤꯡꯒꯤ ꯃꯇꯥꯡꯗꯥ ꯍꯥꯏꯔꯤꯕꯥ ꯋꯥꯍꯟꯊꯣꯛꯂꯣꯟꯅꯤ꯫</p>
+                            
+                            <h3>ꯃꯔꯨꯑꯣꯏꯕꯥ ꯋꯥꯍꯟꯊꯣꯛꯂꯣꯟ</h3>
+                            <p>ꯃꯔꯨꯑꯣꯏꯕꯥ ꯋꯥꯍꯟꯊꯣꯛꯂꯣꯟꯁꯤꯡꯗꯥ ꯑꯌꯥꯝꯕꯥ ꯃꯇꯝꯗꯥ ꯃꯁꯤꯒꯨꯝꯕꯥ ꯋꯥꯍꯟꯊꯣꯛꯂꯣꯟꯁꯤꯡꯗꯥ ꯌꯥꯎꯏ:</p>
+                            <ul>
+                                <li>ꯋꯥꯍꯟꯊꯣꯛꯂꯣꯟ ꯑꯃꯥ</li>
+                                <li>ꯋꯥꯍꯟꯊꯣꯛꯂꯣꯟ ꯑꯃꯗꯥ ꯑꯍꯦꯟꯕꯥ</li>
+                                <li>ꯋꯥꯍꯟꯊꯣꯛꯂꯣꯟ ꯑꯃꯗꯥ ꯑꯅꯤꯁꯨꯕꯥ</li>
+                            </ul>
+                            
+                            <h3>ꯑꯇꯩ ꯃꯔꯨꯑꯣꯏꯕꯥ ꯋꯥꯍꯟꯊꯣꯛꯂꯣꯟ</h3>
+                            <p>ꯑꯇꯩ ꯃꯔꯨꯑꯣꯏꯕꯥ ꯋꯥꯍꯟꯊꯣꯛꯂꯣꯟꯁꯤꯡꯗꯥ ꯑꯌꯥꯝꯕꯥ ꯃꯇꯝꯗꯥ ꯃꯁꯤꯒꯨꯝꯕꯥ ꯋꯥꯍꯟꯊꯣꯛꯂꯣꯟꯁꯤꯡꯗꯥ ꯌꯥꯎꯏ:</p>
+                            <ol>
+                                <li>ꯋꯥꯍꯟꯊꯣꯛꯂꯣꯟ ꯑꯃꯥ</li>
+                                <li>ꯋꯥꯍꯟꯊꯣꯛꯂꯣꯟ ꯑꯃꯗꯥ ꯑꯍꯦꯟꯕꯥ</li>
+                                <li>ꯋꯥꯍꯟꯊꯣꯛꯂꯣꯟ ꯑꯃꯗꯥ ꯑꯅꯤꯁꯨꯕꯥ</li>
+                            </ol>
+                            
+                            <p>ꯍꯟꯗꯣꯛꯄꯥ ꯑꯁꯤꯗꯥ ꯃꯔꯨꯑꯣꯏꯕꯥ ꯋꯥꯍꯟꯊꯣꯛꯂꯣꯟꯒꯤ ꯑꯣꯏꯕꯥ ꯑꯃꯥ ꯎꯠꯂꯤ꯫</p>
+                        </div>
+                        <p class="language-note">ꯍꯟꯗꯣꯛꯄꯥ: ꯃꯤꯇꯩꯂꯣꯟ (ꯃꯩꯇꯩꯂꯣꯟ)</p>
+                    `;
+                }, 2500);
+            }
+            
+            // Function to show error messages
+            function showError(container, message) {
+                container.innerHTML = `<div class="error">${message}</div>`;
+            }
+            
+            // Preload a default article on first load
+            fetchWikipediaArticle('Manipur');
+        });
+    </script>
+</body>
+</html>
