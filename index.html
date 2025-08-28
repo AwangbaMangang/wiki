@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wikipedia Search - Meetei Mayek Translation</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .search-container {
+            padding: 25px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .search-box {
+            display: flex;
+            gap: 10px;
+        }
+        
+        input[type="text"] {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        
+        button {
+            padding: 15px 25px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #2980b9;
+        }
+        
+        .content-area {
+            display: flex;
+            min-height: 500px;
+        }
+        
+        .original-content, .translated-content {
+            flex: 1;
+            padding: 25px;
+            overflow-y: auto;
+            max-height: 600px;
+        }
+        
+        .original-content {
+            border-right: 1px solid #e0e0e0;
+            background: #fcfcfc;
+        }
+        
+        .translated-content {
+            background: #fff;
+        }
+        
+        h2 {
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+            color: #2c3e50;
+        }
+        
+        .article-content {
+            line-height: 1.6;
+        }
+        
+        .article-content p {
+            margin-bottom: 15px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+        }
+        
+        .error {
+            color: #e74c3c;
+            padding: 10px;
+            background: #ffeaea;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        
+        .language-note {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-top: 10px;
+            font-style: italic;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            background: #f8f9fa;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        @media (max-width: 768px) {
+            .content-area {
+                flex-direction: column;
+            }
+            
+            .original-content {
+                border-right: none;
+                border-bottom: 1px solid #e0e0e0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Wikipedia to Meetei Mayek</h1>
+            <p class="subtitle">Search Wikipedia articles and view translations in Meetei Mayek</p>
+        </header>
+        
+        <div class="search-container">
+            <div class="search-box">
+                <input type="text" id="search-input" placeholder="Enter a topic to search on Wikipedia...">
+                <button id="search-btn">Search</button>
+            </div>
+            <p class="language-note">Note: Translation is from English to Meetei Mayek (Manipuri)</p>
+        </div>
+        
+        <div class="content-area">
+            <div class="original-content">
+                <h2>Original Article (English)</h2>
+                <div id="original-article" class="article-content">
+                    <p class="loading">Your search results will appear here...</p>
+                </div>
+            </div>
+            
+            <div class="translated-content">
+                <h2>Translated Article (Meetei Mayek)</h2>
+                <div id="translated-article" class="article-content">
+                    <p class="loading">The translation will appear here...</p>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Wikipedia Search & Machine Translation to Meetei Mayek</p>
+            <p>Note: This is a demonstration of the concept. Actual Meetei Mayek translation would require a specialized translation API.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('search-input');
+            const searchBtn = document.getElementById('search-btn');
+            const originalArticle = document.getElementById('original-article');
+            const translatedArticle = document.getElementById('translated-article');
+            
+            // Focus on search input on load
+            searchInput.focus();
+            
+            // Add event listener for search button
+            searchBtn.addEventListener('click', performSearch);
+            
+            // Add event listener for Enter key in search input
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+            
+            // Function to perform the search
+            function performSearch() {
+                const searchTerm = searchInput.value.trim();
+                
+                if (searchTerm === '') {
+                    showError(originalArticle, 'Please enter a search term.');
+                    return;
+                }
+                
+                // Show loading state
+                originalArticle.innerHTML = '<p class="loading">Searching Wikipedia...</p>';
+                translatedArticle.innerHTML = '<p class="loading">Preparing for translation...</p>';
+                
+                // Fetch Wikipedia article
+                fetchWikipediaArticle(searchTerm);
+            }
+            
+            // Function to fetch Wikipedia article
+            function fetchWikipediaArticle(searchTerm) {
+                // Use Wikipedia API
+                const apiUrl = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(searchTerm)}`;
+                
+                fetch(apiUrl)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Article not found');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Display the original article
+                        displayOriginalArticle(data);
+                        
+                        // Simulate translation to Meetei Mayek
+                        simulateTranslation(data.extract);
+                    })
+                    .catch(error => {
+                        showError(originalArticle, `Error: ${error.message}. Please try another search term.`);
+                        translatedArticle.innerHTML = '<p class="loading">Translation failed due to search error.</p>';
+                    });
+            }
+            
+            // Function to display the original article
+            function displayOriginalArticle(data) {
+                originalArticle.innerHTML = `
+                    <h3>${data.title}</h3>
+                    <p>${data.extract}</p>
+                    ${data.extract_html ? `<div>${data.extract_html}</div>` : ''}
+                    <p class="language-note">Source: Wikipedia</p>
+                `;
+            }
+            
+            // Function to simulate translation (since we can't use a real Meetei Mayek translation API)
+            function simulateTranslation(text) {
+                translatedArticle.innerHTML = '<p class="loading">Translating to Meetei Mayek...</p>';
+                
+                // Simulate API delay
+                setTimeout(() => {
+                    // This is a simulation since we don't have a real Meetei Mayek translation API
+                    // In a real implementation, you would use a translation API here
+                    
+                    // Display simulated translation
+                    translatedArticle.innerHTML = `
+                        <h3>ꯋꯤꯀꯤꯄꯦꯗꯤꯌꯥ ꯒꯤ ꯃꯃꯤꯡ</h3>
+                        <p>ꯃꯁꯤꯒꯤ ꯋꯤꯀꯤꯄꯦꯗꯤꯌꯥ ꯑꯦꯛꯁꯇ꯭ꯔꯦꯛꯇꯀꯤ ꯍꯟꯗꯣꯛꯄꯅꯤ꯫</p>
+                        <p>ꯍꯟꯗꯣꯛꯄꯒꯤ ꯃꯑꯣꯡꯗꯥ꯫ ꯃꯁꯤꯒꯤ ꯑꯣꯔꯤꯒꯤꯅꯦꯜ ꯇꯦꯛꯁꯇꯒꯤ ꯍꯟꯗꯣꯛꯄꯥ ꯑꯁꯤꯅꯥ ꯃꯤꯇꯩꯂꯣꯟꯒꯤ ꯃꯃꯤꯡꯗꯥ ꯎꯠꯂꯤ꯫</p>
+                        <p>ꯍꯟꯗꯣꯛꯄꯥ ꯑꯁꯤꯗꯥ ꯃꯔꯨꯑꯣꯏꯕꯥ ꯋꯥꯍꯟꯊꯣꯛꯂꯣꯟꯒꯤ ꯑꯣꯏꯕꯥ ꯑꯃꯥ ꯎꯠꯂꯤ꯫</p>
+                        <p class="language-note">ꯍꯟꯗꯣꯛꯄꯥ: ꯃꯤꯇꯩꯂꯣꯟ (ꯃꯩꯇꯩꯂꯣꯟ)</p>
+                    `;
+                }, 2000);
+            }
+            
+            // Function to show error messages
+            function showError(container, message) {
+                container.innerHTML = `<p class="error">${message}</p>`;
+            }
+            
+            // Preload a default article on first load
+            fetchWikipediaArticle('Manipur');
+        });
+    </script>
+</body>
+</html>
